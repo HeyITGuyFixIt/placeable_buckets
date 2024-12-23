@@ -98,11 +98,15 @@ end
 
 --This function changes an existing bucket into a placeable bucket.
 --Note that currently, it must replace an existing bucket type that is filled.
-function placeable_buckets.register(name, def)
+function placeable_buckets.register(name, def, base_def)
+	-- allow for alternative empty_def
+	if base_def == nil then
+		base_def = empty_def
+	end
 	--Different treatment is given to the 9 levels of partially filled buckets.
 	for i = 1, 9 do
 		--Copy the empty bucket's definition to use as a base.
-		local new_def = table.copy(empty_def)
+		local new_def = table.copy(base_def)
 		--Allow buckets to define fields that change based on current fill level.
 		local extra_def = (new_def._register_per_level or function() return {} end)(i)
 
@@ -253,7 +257,7 @@ placeable_buckets.register("placeable_buckets:lava", {
 
 
 --If the climate_api mod is present, rain will slowly fill empty_buckets with water.
-if climate_api and minetest.settings:get_bool("placeable_buckets_rain_filling_buckets") then
+if core.global_exists('climate_api') and minetest.settings:get_bool("placeable_buckets_rain_filling_buckets") then
 	minetest.register_abm({
 		label = "Rain Filling Buckets",
 
